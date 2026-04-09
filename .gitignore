@@ -1,0 +1,20 @@
+# Dependências
+node_modules/
+
+# Saídas e relatórios gerados pelo sistema
+reports/*
+data/*
+
+# Ignorar pastas de compilação do TypeScript 
+dist/
+build/
+
+# Ignorar arquivos de log e debug do Node
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Arquivos do sistema operacional (Windows/Mac)
+.DS_Store
+Thumbs.db

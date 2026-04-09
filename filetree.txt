@@ -1,0 +1,32 @@
+aerocode/
+├── data/                       # Armazenamento dos arquivos .txt/ASCII persistidos 
+│   ├── aeronaves.txt
+│   ├── pecas.txt
+│   ├── etapas.txt
+│   └── funcionarios.txt
+├── reports/                    # Relatórios finais gerados pelo sistema [cite: 115]
+├── src/
+│   ├── enums/                  # Definição de todos os valores fixos [cite: 152]
+│   │   ├── TipoAeronave.ts
+│   │   ├── StatusPeca.ts
+│   │   ├── StatusEtapa.ts
+│   │   ├── NivelPermissao.ts
+│   │   ├── TipoTeste.ts
+│   │   └── ResultadoTeste.ts
+│   ├── models/                 # Classes principais (entidades) [cite: 147]
+│   │   ├── Aeronave.ts         # [cite: 148]
+│   │   ├── Peca.ts             # [cite: 149]
+│   │   ├── Etapa.ts            # [cite: 150]
+│   │   ├── Funcionario.ts      # [cite: 150]
+│   │   ├── Teste.ts            # [cite: 151]
+│   │   └── Relatorio.ts        # [cite: 151]
+│   ├── services/               # Lógica de negócio e manipulação de arquivos
+│   │   ├── AuthService.ts      # Controle de login e permissões [cite: 108, 109]
+│   │   ├── StorageService.ts   # Métodos para salvar e carregar dados [cite: 117]
+│   │   └── ProducaoService.ts  # Regras de avanço de etapas e testes [cite: 103, 114]
+│   └── index.ts                # Ponto de entrada da aplicação CLI 
+├── node_modules/               # Dependências do projeto
+├── .gitignore                  # Arquivos para ignorar no Git (ex: node_modules)
+├── package.json                # Gerenciamento de scripts e dependências
+├── tsconfig.json               # Configurações do compilador TypeScript [cite: 160]
+└── README.md                   # Documentação do projeto
