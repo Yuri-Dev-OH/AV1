@@ -36,3 +36,5 @@ export enum ResultadoTeste {
     APROVADO = "APROVADO",
     REPROVADO = "REPROVADO"
 }
+
+// https://www.youtube.com/watch?v=dQw4w9WgXcQ
