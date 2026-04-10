@@ -350,16 +350,44 @@ function menuAeronaves() {
 
 /**
  * Controller: Peca
- * Mostra controle de inventario e movimentacao de status da cadeia de suprimentos.
+ * Modulo atualizado: Pecas agora sao entidades dependentes e agregadas a uma Aeronave.
+ * Roteamento condicional obriga a selecao do aviao contexto antes da operacao.
  */
 function menuPecas() {
     let sair = false;
     while (!sair) {
         console.clear();
         console.log("--- MODULO: GERENCIAR PECAS ---");
+
+        if (aeronavesCadastradas.length === 0) {
+            console.log("Nenhuma aeronave cadastrada. Voce precisa cadastrar um aviao primeiro.");
+            readlineSync.question('\nPressione [ENTER] para voltar...');
+            break;
+        }
+
+        // REGRA DE NEGOCIO: As pecas exigem selecao de aeronave (Composicao/Agregacao)
+        const nomesAeronaves = aeronavesCadastradas.map(a => `${a.codigo} - ${a.modelo}`);
+        const aeroIndex = readlineSync.keyInSelect(nomesAeronaves, 'Escolha a Aeronave para gerenciar as pecas: ', { cancel: 'Voltar ao Menu Principal' });
+
+        if (aeroIndex === -1) { 
+            sair = true; 
+            continue; 
+        }
+
+        const aviaoSelecionado = aeronavesCadastradas[aeroIndex];
+        menuGerenciarPecasAeronave(aviaoSelecionado);
+    }
+}
+
+function menuGerenciarPecasAeronave(aviao: Aeronave) {
+    let voltar = false;
+    while (!voltar) {
+        console.clear();
+        console.log(`--- GERENCIANDO PECAS: ${aviao.codigo} (${aviao.modelo}) ---`);
+
+        const opcoes = ['Listar Pecas da Aeronave'];
         
-        const opcoes = ['Listar Pecas'];
-        
+        // Controle de Acesso
         if (usuarioLogado?.nivelPermissao === NivelPermissao.ADMINISTRADOR) {
             opcoes.push('Cadastrar Peca');
         }
@@ -368,17 +396,17 @@ function menuPecas() {
             opcoes.push('Atualizar Status da Peca');
         }
 
-        const index = readlineSync.keyInSelect(opcoes, 'Digite o NUMERO da opcao: ', { cancel: 'Voltar ao Menu Principal' });
-        if (index === -1) { sair = true; continue; }
+        const index = readlineSync.keyInSelect(opcoes, 'Opcao: ', { cancel: 'Voltar a selecao de Aeronave' });
+        if (index === -1) { voltar = true; continue; }
 
         switch (opcoes[index]) {
-            case 'Listar Pecas':
+            case 'Listar Pecas da Aeronave':
                 console.clear();
-                console.log("--- LISTA DE PECAS ---");
-                if (pecasCadastradas.length === 0) {
-                    console.log("Nenhuma peca cadastrada.");
+                console.log(`--- LISTA DE PECAS (${aviao.codigo}) ---`);
+                if (aviao.pecas.length === 0) {
+                    console.log("Nenhuma peca cadastrada para esta aeronave.");
                 } else {
-                    pecasCadastradas.forEach((p, i) => {
+                    aviao.pecas.forEach((p, i) => {
                         console.log(`[${i}] ${p.nome} | Tipo: ${p.tipo} | Fornecedor: ${p.fornecedor} | Status: ${p.status}`);
                     });
                 }
@@ -394,24 +422,26 @@ function menuPecas() {
                 const tipoIdx = readlineSync.keyInSelect(opcoesTipoPeca, 'Tipo da Peca: ', { cancel: false });
                 
                 const novaPeca = new Peca(nome, opcoesTipoPeca[tipoIdx], fornecedor, StatusPeca.EM_PRODUCAO);
-                novaPeca.salvar();
-                pecasCadastradas.push(novaPeca);
-                console.log(`\n[OK] Peca cadastrada com status inicial EM_PRODUCAO.`);
+                novaPeca.salvar(); // Persistencia individual do componente
+                aviao.pecas.push(novaPeca); // Vinculo relacional com a aeronave
+                
+                console.log(`\n[OK] Peca '${nome}' vinculada com sucesso a aeronave ${aviao.codigo}.`);
                 readlineSync.question('Pressione [ENTER] para voltar...');
                 break;
                 
             case 'Atualizar Status da Peca':
-                if(pecasCadastradas.length === 0) { console.log("Nenhuma peca cadastrada."); break; }
-                const nomesPecas = pecasCadastradas.map(p => `${p.nome} (Atual: ${p.status})`);
+                if(aviao.pecas.length === 0) { console.log("\nNenhuma peca cadastrada nesta aeronave."); readlineSync.question('Pressione [ENTER]'); break; }
+                
+                const nomesPecas = aviao.pecas.map(p => `${p.nome} (Atual: ${p.status})`);
                 const pIndex = readlineSync.keyInSelect(nomesPecas, 'Escolha a peca para atualizar:', { cancel: 'Cancelar' });
                 
                 if (pIndex !== -1) {
                     const statusPossiveis = [StatusPeca.EM_PRODUCAO, StatusPeca.EM_TRANSPORTE, StatusPeca.PRONTA];
                     const sIndex = readlineSync.keyInSelect(statusPossiveis, 'Novo status:', { cancel: false });
                     
-                    // Modifica o estado atravez do metodo interno do dominio
-                    pecasCadastradas[pIndex].atualizarStatus(statusPossiveis[sIndex]);
-                    console.log("[OK] Status atualizado!");
+                    // Modifica o estado atravez do metodo interno do dominio atrelado ao aviao
+                    aviao.pecas[pIndex].atualizarStatus(statusPossiveis[sIndex]);
+                    console.log("\n[OK] Status atualizado!");
                 }
                 readlineSync.question('\nPressione [ENTER] para voltar...');
                 break;
