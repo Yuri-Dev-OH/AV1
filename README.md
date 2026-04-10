@@ -15,5 +15,3 @@ npm install
 -- Após a instalação, inicie o sistema rodando o arquivo principal:
 
 npx ts-node src/index.ts
-
-// Easter egg: Linha 40 do enums/Enums.ts - Link de video no youtube: https://www.youtube.com/watch?v=dQw4w9WgXcQ
